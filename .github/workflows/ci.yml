@@ -13,7 +13,7 @@ jobs:
 
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
-      DB_USER: rmac
+      DB_USER: mac
       DB_PASSWORD: 0000
       DB_DATABASE: calendar_data
 
