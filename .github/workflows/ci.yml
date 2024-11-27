@@ -2,53 +2,59 @@ name: Django CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
-  ci:
-    runs-on: ubuntu-20.04
+  test:
+    runs-on: ubuntu-latest
+
     env:
-      SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DJANGO_DEBUG: "True"
       DB_ENGINE: django.db.backends.postgresql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
+      DB_NAME: calendar_data
       DB_USER: mac
       DB_PASSWORD: 0000
-      DB_DATABASE: calendar_data
 
     steps:
-      - name: Check out the codes
+      - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: Setup python environment
-        id: setup-python
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.12
+          python-version: "3.12"
 
       - name: Set timezone to KST
         run: |
           sudo rm /etc/localtime
           sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
-      - name: Install and Start PostgreSQL # postgres 설치 및 설정
+      - name: Install PostgreSQL
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql
           sudo systemctl start postgresql
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${{ env.DB_PASSWORD }}';"
-          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_DATABASE }};"
+          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_NAME }};"
+          sudo -u postgres psql -c "CREATE USER ${{ env.DB_USER }} WITH PASSWORD '${{ env.DB_PASSWORD }}';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ env.DB_NAME }} TO ${{ env.DB_USER }};"
 
       - name: Install Poetry
         run: |
-          curl -sSL curl -sSL https://install.python-poetry.org | python3 -
+          curl -sSL https://install.python-poetry.org | python3 -
           echo "${HOME}/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: |
           poetry install
+
+      - name: Run migrations
+        run: |
+          poetry run python manage.py migrate
 
       - name: Run black
         run: |
@@ -58,6 +64,6 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
-      - name: Test python project
+      - name: Run tests
         run: |
           poetry run python manage.py test
