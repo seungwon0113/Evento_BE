@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DB_ENGINE: django.db.backends.postgresql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
       DB_USER: mac
