@@ -16,7 +16,7 @@ jobs:
       DB_ENGINE: django.db.backends.postgresql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
-      DB_NAME: calendar_data
+      DB_DATABASE: calendar_data
       DB_USER: mac
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
@@ -39,9 +39,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql
           sudo systemctl start postgresql
-          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_NAME }};"
+          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_DATABASE }};"
           sudo -u postgres psql -c "CREATE USER ${{ env.DB_USER }} WITH PASSWORD '${{ env.DB_PASSWORD }}';"
-          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ env.DB_NAME }} TO ${{ env.DB_USER }};"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ env.DB_DATABASE }} TO ${{ env.DB_USER }};"
 
       - name: Install Poetry
         run: |
