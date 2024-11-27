@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SECRET_KEY: ${{ env.SECRET_KEY }}
-      DJANGO_DEBUG: "True"
+      SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DEBUG: "True"
       DB_ENGINE: django.db.backends.postgresql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
       DB_NAME: calendar_data
       DB_USER: mac
-      DB_PASSWORD: ${{ env.DB_PASSWORD }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     steps:
       - name: Checkout the code
