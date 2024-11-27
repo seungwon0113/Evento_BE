@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     "subscription",
     "notification",
     "location",
+    "contact",
+    "favorite_event",
 ]
 
 MIDDLEWARE = [
