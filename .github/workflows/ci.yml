@@ -16,6 +16,7 @@ jobs:
       DB_USER: mac
       DB_PASSWORD: 0000
       DB_DATABASE: calendar_data
+      SECRET_KEY: ${{ env.SECRET_KEY }}
 
     steps:
       - name: Check out the codes
