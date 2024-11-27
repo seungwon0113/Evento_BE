@@ -102,7 +102,7 @@ DATABASES = {
         "PORT": env("DB_PORT"),
     }
 }
-
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
