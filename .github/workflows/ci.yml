@@ -16,7 +16,7 @@ jobs:
       DB_PORT: 5432
       DB_USER: mac
       DB_PASSWORD: 0000
-      DB_DATABASE: calendar_data
+      DB_NAME: calendar_data
 
     steps:
       - name: Check out the codes
