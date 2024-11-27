@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "evento-be"
+version = "0.1.0"
+description = ""
+authors = ["seungwon0113 <dhkd0113@naver.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.1.3"
+psycopg2-binary = "^2.9.10"
+postgres = "^4.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+isort = "^5.13.2"
+coverage = "^7.6.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
