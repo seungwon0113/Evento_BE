@@ -10,36 +10,39 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    env:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      DEBUG: "False"
-      DB_HOST: "localhost"
-      DB_PORT: "5432"
-      DB_NAME: "calendar_db"
-      DB_USER: "mac"
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
     services:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_USER: "mac"
+          POSTGRES_USER: mac
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: "calendar_db"
+          POSTGRES_DB: calendar_db
+        ports:
+          - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U mac -d calendar_db" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=3
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: "False"
+      DB_NAME: "calendar_db"
+      DB_USER: "mac"
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HOST: "localhost"
+      DB_PORT: "5432"
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.12"
+          cache: "pip"
 
       - name: Install Poetry
         run: |
