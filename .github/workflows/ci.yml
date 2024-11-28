@@ -5,14 +5,17 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-20.04
-    env:
+    runs-on: ubuntu-latest
 
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_USER: mac
+    env:
+      SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DEBUG: "False"
+      DB_NAME: "calendar_db"
+      DB_USER: "mac"
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_DATABASE: calendar_db
+      DB_HOST: "localhost"
+      DB_PORT: "5432"
+
     steps:
       - name: Check out the codes
         uses: actions/checkout@v2
@@ -21,21 +24,38 @@ jobs:
         id: setup-python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.12
+          python-version: "3.12"
 
       - name: Set timezone to KST
         run: |
           sudo rm /etc/localtime
           sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
+      - name: Install PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql postgresql-contrib
+          sudo service postgresql start
+          sudo -u postgres psql -c "CREATE DATABASE calendar_db;"
+          sudo -u postgres psql -c "CREATE USER mac WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          sudo -u postgres psql -c "ALTER ROLE mac SET client_encoding TO 'utf8';"
+          sudo -u postgres psql -c "ALTER ROLE mac SET default_transaction_isolation TO 'read committed';"
+          sudo -u postgres psql -c "ALTER ROLE mac SET timezone TO 'UTC';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE calendar_db TO mac;"
+          sudo -u postgres psql -c "ALTER USER mac CREATEDB;"
+
       - name: Install Poetry
         run: |
-          curl -sSL curl -sSL https://install.python-poetry.org | python3 -
+          curl -sSL https://install.python-poetry.org | python3 -
           echo "${HOME}/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: |
           poetry install
+
+      - name: Run migrations
+        run: |
+          poetry run python manage.py migrate
 
       - name: Run black
         run: |
@@ -45,6 +65,6 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
-      - name: Test python project
+      - name: Run tests
         run: |
           poetry run python manage.py test
