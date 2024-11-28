@@ -31,13 +31,17 @@ jobs:
           sudo rm /etc/localtime
           sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
-      - name: Install and Start PostgreSQL # postgres 설치 및 설정
+      - name: Install PostgreSQL
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql
-          sudo systemctl start postgresql
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${{ env.DB_PASSWORD }}';"
-          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_DATABASE }};"        
+          sudo apt-get install -y postgresql postgresql-contrib
+          sudo service postgresql start
+          sudo -u postgres psql -c "CREATE DATABASE calendar_db;"
+          sudo -u postgres psql -c "CREATE USER mac WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          sudo -u postgres psql -c "ALTER ROLE mac SET client_encoding TO 'utf8';"
+          sudo -u postgres psql -c "ALTER ROLE mac SET default_transaction_isolation TO 'read committed';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE calendar_db TO mac;"
+          sudo -u postgres psql -c "ALTER USER mac CREATEDB;"
 
       - name: Install Poetry
         run: |
