@@ -19,6 +19,13 @@ jobs:
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
+    run: |
+      echo "DB_HOST=$DB_HOST"
+      echo "DB_NAME=$DB_NAME"
+      echo "DB_USER=$DB_USER"
+      echo "DB_PASSWORD=$DB_PASSWORD"
+      echo "DB_PORT=$DB_PORT"      
+
     services:
       postgres:
         image: postgres:14
@@ -33,14 +40,6 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: Debug Environment Variables
-        run: |
-          echo "DB_HOST=$DB_HOST"
-          echo "DB_NAME=$DB_NAME"
-          echo "DB_USER=$DB_USER"
-          echo "DB_PASSWORD=$DB_PASSWORD"
-          echo "DB_PORT=$DB_PORT"
-
       - name: Checkout the code
         uses: actions/checkout@v2
 
