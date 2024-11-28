@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop ]
   pull_request:
-    branches: [main, develop]
+    branches: [ main, develop ]
 
 jobs:
   ci:
@@ -20,25 +20,12 @@ jobs:
       DB_USER: "mac"
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
-        options: >-
-          --health-cmd="pg_isready -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }}" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=3
-
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: "3.12"
 
@@ -46,6 +33,15 @@ jobs:
         run: |
           sudo rm /etc/localtime
           sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+      - name: Install PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql
+          sudo systemctl start postgresql
+          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_NAME }};"
+          sudo -u postgres psql -c "CREATE USER ${{ env.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ env.DB_NAME }} TO ${{ env.DB_USER }};"
 
       - name: Install Poetry
         run: |
@@ -70,4 +66,4 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run
+          poetry run python manage.py test
