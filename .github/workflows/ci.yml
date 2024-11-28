@@ -12,19 +12,12 @@ jobs:
 
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      DEBUG: "True"
+      DEBUG: "False"
       DB_HOST: "localhost"
       DB_PORT: "5432"
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
-    run: |
-      echo "DB_HOST=$DB_HOST"
-      echo "DB_NAME=$DB_NAME"
-      echo "DB_USER=$DB_USER"
-      echo "DB_PASSWORD=$DB_PASSWORD"
-      echo "DB_PORT=$DB_PORT"      
+      DB_NAME: "calendar_db"
+      DB_USER: "mac"
+      DB_PASSWORD: "1234"
 
     services:
       postgres:
@@ -46,7 +39,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
       - name: Install Poetry
         run: |
@@ -58,14 +51,6 @@ jobs:
           poetry install
 
       - name: Run migrations
-        env:
-          DEBUG: "False"
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DB_HOST: localhost
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_PORT: "5432"
         run: |
           poetry run python manage.py migrate
 
@@ -80,4 +65,3 @@ jobs:
       - name: Run tests
         run: |
           poetry run python manage.py test
-
