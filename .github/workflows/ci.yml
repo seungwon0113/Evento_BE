@@ -17,14 +17,14 @@ jobs:
       DB_PORT: "5432"
       DB_NAME: "calendar_db"
       DB_USER: "mac"
-      DB_PASSWORD: "1234"
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     services:
       postgres:
         image: postgres:14
         env:
           POSTGRES_USER: "mac"
-          POSTGRES_PASSWORD: "1234"
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
           POSTGRES_DB: "calendar_db"
         options: >-
           --health-cmd="pg_isready -U mac -d calendar_db" 
@@ -37,9 +37,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install Poetry
         run: |
