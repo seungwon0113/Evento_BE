@@ -2,60 +2,40 @@ name: Django CI
 
 on:
   push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_USER: mac
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: calendar_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+    runs-on: ubuntu-20.04
     env:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      DEBUG: "False"
-      DB_NAME: "calendar_db"
-      DB_USER: "mac"
+
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: mac
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_HOST: "localhost"
-      DB_PORT: "5432"
-
+      DB_DATABASE: calendar_db
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
+      - name: Check out the codes
+        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup python environment
+        id: setup-python
+        uses: actions/setup-python@v2
         with:
-          python-version: "3.12"
-          cache: "pip"
+          python-version: 3.12
+
+      - name: Set timezone to KST
+        run: |
+          sudo rm /etc/localtime
+          sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
       - name: Install Poetry
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
+          curl -sSL curl -sSL https://install.python-poetry.org | python3 -
           echo "${HOME}/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: |
           poetry install
-
-      - name: Run migrations
-        run: |
-          poetry run python manage.py migrate
 
       - name: Run black
         run: |
@@ -65,6 +45,6 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
-      - name: Run tests
+      - name: Test python project
         run: |
           poetry run python manage.py test
