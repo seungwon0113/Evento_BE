@@ -16,7 +16,7 @@ jobs:
       DB_ENGINE: "django.db.backends.postgresql"
       DB_HOST: "localhost"
       DB_PORT: "5432"
-      DB_NAME: "calendar_data"
+      DB_NAME: "calendar_db"
       DB_USER: "mac"
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
